@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Basic Data Structures Cheat Sheet (A‑Range) — COMP2119</title>
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: { 
+        inlineMath: [['\\(','\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-main: #f8fafc;
+      --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      --card-bg: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent-primary: #0ea5e9;
+      --accent-secondary: #8b5cf6;
+      --accent-teal: #14b8a6;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --code-bg: #1e293b;
+      --code-text: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+    * {box-sizing: border-box;margin: 0;padding: 0;}
+    html {overflow-x: hidden;width: 100%;scroll-behavior: smooth;}
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+      width: 100%;
+    }
+    header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+      color: white;
+      padding: 3rem 2rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;left: 0;right: 0;bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .wrap {max-width: 1200px;margin: 0 auto;padding: 0 1.5rem;position: relative;z-index: 1;width: 100%;overflow-x: hidden;}
+    h1 {margin: 0 0 0.75rem;font-size: 2.5rem;font-weight: 800;letter-spacing: -0.5px;text-shadow: 2px 2px 4px rgba(0,0,0,0.1);}
+    .subtitle {color: rgba(255,255,255,0.9);margin: 0 0 1.5rem;font-size: 1.1rem;line-height: 1.6;font-weight: 300;}
+    .pillbar {display: flex;flex-wrap: wrap;gap: 0.75rem;margin-top: 1.5rem;}
+    .pill {background: rgba(255,255,255,0.15);backdrop-filter: blur(10px);border: 1px solid rgba(255,255,255,0.2);padding: 0.5rem 1rem;border-radius: 50px;color: rgba(255,255,255,0.95);font-size: 0.85rem;font-weight: 500;transition: all 0.2s;}
+    .pill:hover {background: rgba(255,255,255,0.25);transform: translateY(-1px);}
+    .pill strong {color: white;font-weight: 700;}
+    nav {margin-top: 1.5rem;display: flex;flex-wrap: wrap;gap: 1rem;}
+    nav a {color: white;text-decoration: none;background: rgba(255,255,255,0.1);padding: 0.5rem 1rem;border-radius: 8px;font-size: 0.9rem;font-weight: 500;transition: all 0.2s;border: 1px solid rgba(255,255,255,0.2);}
+    nav a:hover {background: rgba(255,255,255,0.2);transform: translateY(-2px);box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+    main {padding: 2.5rem 0 4rem;width: 100%;overflow-x: hidden;}
+    .grid {display: grid;grid-template-columns: 1fr;gap: 1.5rem;width: 100%;max-width: 100%;}
+    @media (min-width: 900px) {.grid {grid-template-columns: 1.2fr 0.8fr;}}
+    .card {background: var(--card-bg);border: 1px solid var(--border-light);border-radius: 16px;padding: 2rem;box-shadow: var(--shadow-md);transition: all 0.3s;page-break-inside: avoid;break-inside: avoid;width: 100%;overflow: hidden;}
+    .card:hover {box-shadow: var(--shadow-lg);transform: translateY(-2px);}
+    h2 {margin: 0 0 1.5rem;font-size: 1.75rem;font-weight: 700;color: var(--accent-primary);border-bottom: 3px solid var(--accent-primary);padding-bottom: 0.5rem;display: inline-block;page-break-after: avoid;break-after: avoid;}
+    h3 {margin: 1.75rem 0 0.75rem;font-size: 1.25rem;font-weight: 600;color: var(--accent-secondary);page-break-after: avoid;break-after: avoid;}
+    p {margin: 0.75rem 0;color: var(--text-secondary);line-height: 1.8;overflow-wrap: break-word;word-wrap: break-word;hyphens: auto;}
+    .muted {color: var(--text-muted);}
+    .hr {height: 1px;background: var(--border-light);margin: 1.5rem 0;border: none;}
+    code, pre {font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;}
+    code {background: #f1f5f9;color: #8b5cf6;padding: 0.2rem 0.5rem;border-radius: 4px;font-size: 0.9em;font-weight: 500;}
+    pre {background: var(--code-bg);color: var(--code-text);border: 1px solid var(--border-medium);border-radius: 12px;padding: 1.25rem;overflow-x: auto;margin: 1.25rem 0;font-size: 0.875rem;line-height: 1.6;box-shadow: var(--shadow-sm);page-break-inside: avoid;break-inside: avoid;max-width: 100%;word-wrap: break-word;white-space: pre-wrap;}
+    pre code {background: none;color: inherit;padding: 0;font-size: inherit;}
+    .callout {border-left: 4px solid var(--accent-teal);background: rgba(20, 184, 166, 0.08);padding: 1rem 1.25rem;border-radius: 8px;margin: 1.25rem 0;page-break-inside: avoid;break-inside: avoid;max-width: 100%;overflow-wrap: break-word;word-wrap: break-word;}
+    .callout.warn {border-left-color: var(--warn);background: rgba(245, 158, 11, 0.08);}
+    .callout.bad {border-left-color: var(--danger);background: rgba(239, 68, 68, 0.08);}
+    .callout.good {border-left-color: var(--success);background: rgba(16, 185, 129, 0.08);}
+    .callout strong {color: var(--text-primary);font-weight: 700;}
+    table {width: 100%;border-collapse: separate;border-spacing: 0;overflow: hidden;border-radius: 12px;border: 1px solid var(--border-light);margin: 1.25rem 0;font-size: 0.9rem;box-shadow: var(--shadow-sm);page-break-inside: avoid;break-inside: avoid;display: block;overflow-x: auto;max-width: 100%;}
+    table tbody, table thead {display: table;width: 100%;}
+    th, td {padding: 0.875rem 1rem;border-bottom: 1px solid var(--border-light);vertical-align: top;text-align: left;}
+    th {background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);color: var(--text-primary);font-weight: 700;font-size: 0.875rem;text-transform: uppercase;letter-spacing: 0.5px;}
+    td {color: var(--text-secondary);}
+    tr:last-child td {border-bottom: none;}
+    tbody tr:hover {background: rgba(14, 165, 233, 0.04);}
+    .k {display: inline-block;padding: 0.25rem 0.75rem;border-radius: 50px;background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);border: 1px solid #93c5fd;color: #1e40af;font-size: 0.8rem;font-weight: 600;margin-right: 0.5rem;}
+    .small {font-size: 0.875rem;}
+    ol, ul {margin: 0.75rem 0;padding-left: 1.5rem;}
+    li {margin: 0.5rem 0;color: var(--text-secondary);line-height: 1.7;}
+    details {border: 1px solid var(--border-light);border-radius: 12px;padding: 1rem 1.25rem;background: #fafafa;margin: 1.25rem 0;page-break-inside: avoid;break-inside: avoid;}
+    details[open] {background: white;box-shadow: var(--shadow-sm);}
+    summary {cursor: pointer;color: var(--accent-secondary);font-weight: 700;font-size: 1rem;padding: 0.5rem 0;user-select: none;transition: color 0.2s;}
+    summary:hover {color: var(--accent-primary);}
+    details[open] summary {margin-bottom: 1rem;padding-bottom: 1rem;border-bottom: 1px solid var(--border-light);}
+    .toc {display: flex;flex-direction: column;gap: 0.75rem;}
+    .toc a {color: var(--text-secondary);text-decoration: none;font-size: 0.9rem;padding: 0.5rem 0.75rem;border-radius: 6px;transition: all 0.2s;display: block;}
+    .toc a:hover {color: var(--accent-primary);background: rgba(14, 165, 233, 0.08);padding-left: 1rem;}
+    .footer {margin-top: 1.5rem;padding: 1rem;background: rgba(14, 165, 233, 0.05);border-radius: 8px;color: var(--text-muted);font-size: 0.875rem;line-height: 1.6;}
+    .twoCol {display: grid;grid-template-columns: 1fr;gap: 1rem;}
+    @media (min-width: 720px) {.twoCol {grid-template-columns: 1fr 1fr;}}
+    .badge {display: inline-block;padding: 0.25rem 0.75rem;border-radius: 50px;background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);border: 1px solid #93c5fd;color: #1e40af;font-size: 0.8rem;font-weight: 600;margin-right: 0.5rem;}
+    mjx-container, mjx-math, .MathJax {color: var(--text-primary) !important;max-width: 100%;overflow-x: auto;overflow-y: hidden;}
+    mjx-container[display="true"] {overflow-x: auto;overflow-y: hidden;}
+    @media (max-width: 768px) {h1 {font-size: 2rem;}h2 {font-size: 1.5rem;}h3 {font-size: 1.125rem;}.card {padding: 1.5rem;}header {padding: 2rem 1.5rem;}table {font-size: 0.8rem;}th, td {padding: 0.625rem 0.75rem;}}
+    @media print {* {overflow: visible !important;}body {background: white;padding: 0;overflow-x: visible;width: 100%;}header {background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);-webkit-print-color-adjust: exact;print-color-adjust: exact;page-break-after: avoid;break-after: avoid;}.wrap {max-width: 100%;padding: 0 1rem;}.card {box-shadow: none;border: 1px solid var(--border-light);page-break-inside: avoid;break-inside: avoid;margin-bottom: 1.5rem;padding: 1.5rem;}.card:hover {transform: none;box-shadow: none;}h1, h2, h3, h4 {page-break-after: avoid;break-after: avoid;}h1 + p, h2 + p, h3 + p, h4 + p {page-break-before: avoid;break-before: avoid;}h2 {page-break-before: auto;break-before: auto;margin-top: 1rem;}.callout, details, table, pre {page-break-inside: avoid;break-inside: avoid;max-width: 100%;}pre {background: var(--code-bg) !important;color: var(--code-text) !important;-webkit-print-color-adjust: exact;print-color-adjust: exact;white-space: pre-wrap;word-wrap: break-word;overflow: visible;}table {page-break-inside: avoid;break-inside: avoid;font-size: 0.8rem;}th, td {padding: 0.5rem 0.75rem;}details {border: 1px solid var(--border-light);page-break-inside: avoid;}details[open] {page-break-inside: avoid;}summary {cursor: default;}.grid {grid-template-columns: 1fr;gap: 1rem;}nav {page-break-after: avoid;break-after: avoid;}nav a {page-break-inside: avoid;break-inside: avoid;}p, ul, ol {orphans: 3;widows: 3;}mjx-container, mjx-math, .MathJax {color: #000000 !important;overflow: visible !important;}.pill {-webkit-print-color-adjust: exact;print-color-adjust: exact;}.pillbar {page-break-inside: avoid;break-inside: avoid;}aside {page-break-inside: avoid;break-inside: avoid;}}
+    ::-webkit-scrollbar {width: 10px;height: 10px;}
+    ::-webkit-scrollbar-track {background: #f1f5f9;}
+    ::-webkit-scrollbar-thumb {background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);border-radius: 5px;}
+    ::-webkit-scrollbar-thumb:hover {background: linear-gradient(135deg, #0284c7 0%, #7c3aed 100%);}
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <h1>Basic Data Structures Cheat Sheet (A‑Range)</h1>
+    <p class="subtitle">Arrays & dynamic arrays, linked lists, stacks, queues, circular buffers, and the exact tracing + proof templates COMP2119 tests.</p>
+
+    <div class="pillbar">
+      <span class="pill"><strong>Core skills</strong>: trace operations; write correct pointer updates; state invariants</span>
+      <span class="pill"><strong>Must know</strong>: time tables; circular queue rules; amortized \(O(1)\) arguments</span>
+      <span class="pill"><strong>Exam traps</strong>: empty/full ambiguity; off‑by‑one; losing head; NULL deref</span>
+      <span class="pill"><strong>Implementation</strong>: array vs list tradeoffs; 2‑stack queue; dynamic array doubling</span>
+    </div>
+
+    <nav>
+      <a href="#defs">What examiners mean</a>
+      <a href="#arrays">Arrays & dynamic arrays</a>
+      <a href="#ll">Linked lists</a>
+      <a href="#stack">Stacks</a>
+      <a href="#queue">Queues & circular queues</a>
+      <a href="#amortized">Amortized proofs</a>
+      <a href="#hard">Hard traps</a>
+      <a href="#practice">Hard practice set</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="grid">
+
+      <section class="card" id="defs">
+        <h2>1) What COMP2119 expects you to say</h2>
+
+        <h3>ADT vs Implementation (marks are strict)</h3>
+        <ul>
+          <li><strong>ADT (abstract data type)</strong> = operations + behavior. Example: Stack supports <code>push</code>, <code>pop</code>, <code>top</code> with LIFO semantics.</li>
+          <li><strong>Implementation</strong> = how it’s stored (array, linked list, two stacks, etc.).</li>
+          <li><strong>Full‑mark habit:</strong> when you claim an operation is \(O(1)\), say whether it is <strong>worst‑case</strong> or <strong>amortized</strong>.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Exam wording translator:</strong>
+          <ul>
+            <li>“Give an algorithm” → show steps/pseudocode + base cases + complexity.</li>
+            <li>“Trace the operations” → show structure state after each step OR output sequence.</li>
+            <li>“Explain why \(O(1)\)” → give a short amortized/charging argument.</li>
+          </ul>
+        </div>
+
+        <h3>The complexity table you should be able to recreate</h3>
+        <div class="callout">
+          <table style="width:100%; border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="text-align:left; padding:6px;">Structure</th>
+                <th style="text-align:left; padding:6px;">Operation</th>
+                <th style="text-align:left; padding:6px;">Time</th>
+                <th style="text-align:left; padding:6px;">Common trap</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:6px;">Array</td><td style="padding:6px;">A[i]</td><td style="padding:6px;">\(O(1)\)</td><td style="padding:6px;">Index bounds</td></tr>
+              <tr><td style="padding:6px;">Array</td><td style="padding:6px;">Insert/delete at middle</td><td style="padding:6px;">\(O(n)\)</td><td style="padding:6px;">Shifts</td></tr>
+              <tr><td style="padding:6px;">Dynamic array</td><td style="padding:6px;">append</td><td style="padding:6px;">Amortized \(O(1)\)</td><td style="padding:6px;">Worst-case resize \(O(n)\)</td></tr>
+              <tr><td style="padding:6px;">Singly LL (head)</td><td style="padding:6px;">Insert at head</td><td style="padding:6px;">\(O(1)\)</td><td style="padding:6px;">Forget to update head</td></tr>
+              <tr><td style="padding:6px;">Singly LL</td><td style="padding:6px;">Search(x)</td><td style="padding:6px;">\(O(n)\)</td><td style="padding:6px;">NULL deref</td></tr>
+              <tr><td style="padding:6px;">Doubly LL</td><td style="padding:6px;">Delete given node ptr</td><td style="padding:6px;">\(O(1)\)</td><td style="padding:6px;">Update both links</td></tr>
+              <tr><td style="padding:6px;">Stack</td><td style="padding:6px;">push/pop/top</td><td style="padding:6px;">\(O(1)\)</td><td style="padding:6px;">Underflow</td></tr>
+              <tr><td style="padding:6px;">Queue (circular array)</td><td style="padding:6px;">enqueue/dequeue</td><td style="padding:6px;">\(O(1)\)</td><td style="padding:6px;">Empty vs full ambiguity</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" id="arrays">
+        <h2>2) Arrays & Dynamic Arrays (vector-style)</h2>
+
+        <h3>Static array</h3>
+        <ul>
+          <li>Random access \(A[i]\) is \(O(1)\).</li>
+          <li>Insert/delete in the middle requires shifting: \(O(n)\).</li>
+          <li>Best for: frequent random access, fixed size.</li>
+        </ul>
+
+        <h3>Dynamic array (like C++ <code>vector</code>)</h3>
+        <ul>
+          <li>Stores <strong>capacity</strong> and <strong>size</strong>.</li>
+          <li>When size==capacity, allocate bigger array (often double) and copy.</li>
+          <li>Append is amortized \(O(1)\), but a single append can be \(O(n)\) during resize.</li>
+        </ul>
+
+        <div class="callout warn">
+          <strong>Common exam question:</strong> “Why is append amortized \(O(1)\)?” → you must give a charging/potential proof (see Section 6).
+        </div>
+
+<pre><code>// Typical dynamic array fields
+size   // number of elements stored
+cap    // allocated length
+arr    // pointer to memory of length cap
+
+append(x):
+  if size == cap:
+    cap = max(1, 2*cap)
+    newArr = allocate(cap)
+    copy arr[0..size-1] to newArr
+    arr = newArr
+  arr[size] = x
+  size++
+</code></pre>
+
+        <h3>Worst-case vs amortized: say it correctly</h3>
+        <ul>
+          <li>Worst-case append: \(O(n)\) (when resizing/copying).</li>
+          <li>Amortized append over \(m\) appends: \(O(1)\).</li>
+          <li>Space overhead: capacity can be up to ~2×size (constant factor).</li>
+        </ul>
+      </section>
+
+      <section class="card" id="ll">
+        <h2>3) Linked Lists (Singly & Doubly) — pointer discipline</h2>
+
+        <h3>Node models you must recognize</h3>
+<pre><code>// singly
+struct Node {
+  int data;
+  Node* next;
+};
+
+// doubly
+struct DNode {
+  int data;
+  DNode* prev;
+  DNode* next;
+};
+</code></pre>
+
+        <h3>Core invariants (write them in exam answers)</h3>
+        <ul>
+          <li><strong>Head</strong> points to the first node, or NULL if empty.</li>
+          <li>Each node’s <code>next</code> points to the next node, last node’s <code>next</code> is NULL.</li>
+          <li>Doubly list: for any interior node x: <code>x.prev.next == x</code> and <code>x.next.prev == x</code>.</li>
+        </ul>
+
+        <h3>Singly list: insert at head (O(1))</h3>
+<pre><code>insertHead(head, x):
+  n = new Node(x)
+  n.next = head
+  head = n
+  return head
+</code></pre>
+
+        <h3>Singly list: delete first occurrence of value (O(n))</h3>
+<pre><code>deleteValue(head, x):
+  if head == NULL: return head
+  if head.data == x:
+    head = head.next
+    return head
+  prev = head
+  cur  = head.next
+  while cur != NULL and cur.data != x:
+    prev = cur
+    cur = cur.next
+  if cur != NULL:
+    prev.next = cur.next
+  return head
+</code></pre>
+
+        <div class="callout warn">
+          <strong>Big trap:</strong> In a singly list, to delete <code>cur</code> you need <code>prev</code>. If you don’t store it, you cannot fix the link.
+        </div>
+
+        <h3>In-place reverse of singly list (high-frequency)</h3>
+        <p class="small">Memorize the “prev/cur/nxt” pattern. If you can write this from memory, you’re safe.</p>
+<pre><code>reverse(head):
+  prev = NULL
+  cur  = head
+  while cur != NULL:
+    nxt = cur.next
+    cur.next = prev
+    prev = cur
+    cur  = nxt
+  return prev
+</code></pre>
+
+        <div class="callout">
+          <strong>Correct complexity statement:</strong> time \(\Theta(n)\), extra space \(\Theta(1)\).
+        </div>
+
+        <h3>Cycle detection (Floyd) — classic</h3>
+<pre><code>hasCycle(head):
+  slow = head
+  fast = head
+  while fast != NULL and fast.next != NULL:
+    slow = slow.next
+    fast = fast.next.next
+    if slow == fast:
+      return true
+  return false
+</code></pre>
+
+        <h3>Doubly list: delete given node pointer in \(O(1)\)</h3>
+<pre><code>deleteNode(head, tail, x):
+  if x == NULL: return
+  if x.prev != NULL: x.prev.next = x.next
+  else:              head = x.next       // x was head
+  if x.next != NULL: x.next.prev = x.prev
+  else:              tail = x.prev       // x was tail
+</code></pre>
+
+        <div class="callout warn">
+          <strong>Trap:</strong> if x is head or tail, you must update the external head/tail pointer. Students lose marks here.
+        </div>
+      </section>
+
+      <section class="card" id="stack">
+        <h2>4) Stacks — tracing and the classic patterns</h2>
+
+        <h3>Stack operations</h3>
+        <ul>
+          <li><code>push(x)</code>, <code>pop()</code>, <code>top()</code>, <code>isEmpty()</code> are \(O(1)\).</li>
+          <li>Array implementation: use an integer <code>top</code> index.</li>
+          <li>Linked list implementation: push/pop at head.</li>
+        </ul>
+
+        <h3>How to trace stack questions quickly</h3>
+        <ul>
+          <li>Draw the stack with <strong>top on the right</strong>.</li>
+          <li>Only <code>pop()</code> produces output.</li>
+          <li>If the question specifies behavior on empty pop, state “underflow”.</li>
+        </ul>
+
+        <h3>Bracket matching (must be automatic)</h3>
+        <ol>
+          <li>Push opening brackets <code>( [ {</code>.</li>
+          <li>On a closing bracket: stack must not be empty and top must match type.</li>
+          <li>At the end: stack must be empty.</li>
+        </ol>
+
+        <h3>Infix → Postfix (exam-friendly explanation)</h3>
+        <ul>
+          <li>Operands go directly to output.</li>
+          <li>Operators: pop while stack top has higher or equal precedence (for left-associative ops), then push current operator.</li>
+          <li>Parentheses: push '('; when ')' appears, pop until '(' is removed.</li>
+        </ul>
+
+        <div class="callout warn">
+          <strong>Associativity trap:</strong> For exponentiation (right-associative), you do NOT pop on equal precedence.
+        </div>
+      </section>
+
+      <section class="card" id="queue">
+        <h2>5) Queues & Circular Queues (array implementation is exam-favorite)</h2>
+
+        <h3>Queue basics</h3>
+        <ul>
+          <li>FIFO: first in, first out.</li>
+          <li><code>enqueue</code> at rear, <code>dequeue</code> at front.</li>
+          <li>Target complexity: \(O(1)\) per operation.</li>
+        </ul>
+
+        <h3>Circular array queue (the exam trap zone)</h3>
+        <p class="small">You MUST state the convention you use.</p>
+
+        <div class="callout">
+          <strong>Recommended convention:</strong>
+          <ul>
+            <li><code>front</code> points to the first element.</li>
+            <li><code>rear</code> points to the <strong>next free slot</strong>.</li>
+            <li>Advance by \((i+1)mod m\).</li>
+          </ul>
+        </div>
+
+        <h3>Empty vs Full (two valid solutions)</h3>
+        <ul>
+          <li><strong>Option A (store size):</strong> empty if size=0, full if size=m.</li>
+          <li><strong>Option B (one-empty-slot):</strong> empty if front==rear, full if (rear+1)%m == front.</li>
+        </ul>
+
+        <h3>Pseudocode (Option B: one-empty-slot)</h3>
+<pre><code>// capacity m, array Q[0..m-1]
+isEmpty(): front == rear
+isFull():  (rear + 1) % m == front
+
+enqueue(x):
+  if isFull(): error
+  Q[rear] = x
+  rear = (rear + 1) % m
+
+dequeue():
+  if isEmpty(): error
+  x = Q[front]
+  front = (front + 1) % m
+  return x
+</code></pre>
+
+        <div class="callout warn">
+          <strong>Hard trap:</strong> Option B stores at most \(m-1\) items. You must say this.
+        </div>
+
+        <h3>Queue using two stacks (high yield)</h3>
+<pre><code>enqueue(x):
+  push(in, x)
+
+dequeue():
+  if empty(out):
+    while not empty(in):
+      push(out, pop(in))
+  return pop(out)
+</code></pre>
+
+        <div class="callout">
+          <strong>Correct statement:</strong> worst-case dequeue can be \(O(n)\), but amortized cost per operation is \(O(1)\).
+        </div>
+      </section>
+
+      <section class="card" id="amortized">
+        <h2>6) Amortized proofs — the exact short answers</h2>
+
+        <h3>A) Dynamic array doubling ⇒ amortized \(O(1)\) append</h3>
+        <ul>
+          <li>When capacity doubles from \(k\) to \(2k\), you copy exactly \(k\) items.</li>
+          <li>Between these two resizes, you perform at least \(k\) appends.</li>
+          <li>Charge each append a constant “credit” to pay for future copying.</li>
+          <li>Total cost over \(m\) appends is \(O(m)\) ⇒ amortized \(O(1)\).</li>
+        </ul>
+        <div class="callout">
+          <strong>One-line bound:</strong> total copied items \(\le 1 + 2 + 4 + \dots + 2^{\lfloor \log m 
+floor} < 2m\).
+        </div>
+
+        <h3>B) Two-stack queue ⇒ amortized \(O(1)\)</h3>
+        <ul>
+          <li>Each element: pushed to <code>in</code> once.</li>
+          <li>Moved from <code>in</code> to <code>out</code> at most once (one pop + one push).</li>
+          <li>Popped from <code>out</code> once when dequeued.</li>
+          <li>So ≤ 4 stack ops per element ⇒ total \(O(m)\) for \(m\) queue operations ⇒ amortized \(O(1)\).</li>
+        </ul>
+
+        <div class="callout warn">
+          <strong>Important wording:</strong> amortized \(O(1)\) ≠ every operation \(O(1)\). It’s the average over a sequence.
+        </div>
+      </section>
+
+      <section class="card" id="hard">
+        <h2>7) Hard traps (this is where marks disappear)</h2>
+
+        <h3>Linked list traps</h3>
+        <ul>
+          <li>Losing <code>head</code> by overwriting pointers without saving them.</li>
+          <li>Dereferencing NULL: accessing <code>cur.next</code> when <code>cur</code> might be NULL.</li>
+          <li>Deleting in singly list without storing predecessor.</li>
+          <li>Doubly list deletion: forgetting to update both directions, or head/tail pointers.</li>
+        </ul>
+
+        <h3>Circular queue traps</h3>
+        <ul>
+          <li>Not stating the empty/full rule (size vs one-empty-slot).</li>
+          <li>Mixing conventions: rear as “last element” vs “next free slot”. Pick one.</li>
+          <li>Forgetting modulo update.</li>
+        </ul>
+
+        <h3>Tracing traps</h3>
+        <ul>
+          <li>Output only on pop/dequeue, not on push/enqueue.</li>
+          <li>If asked: explicitly state “underflow/overflow” behavior.</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Strict exam habit:</strong> write invariants before code: “I assume rear points to next free slot”.
+        </div>
+      </section>
+
+      <section class="card" id="practice">
+        <h2>8) Hard practice set (COMP2119-style) — with answer key</h2>
+
+        <h3>A) Trace (stack)</h3>
+        <p class="small">Stack initially empty. Operations:</p>
+        <ol>
+          <li>push(12), push(3), push(5), pop(), push(26), push(2), pop(), pop(), push(85), pop(), pop()</li>
+          <li>Write (i) pop output sequence (ii) final stack content (top on right).</li>
+        </ol>
+
+        <h3>B) Trace (queue)</h3>
+        <p class="small">Queue initially empty. Operations:</p>
+        <ol>
+          <li>enqueue(12), enqueue(3), enqueue(5), dequeue(), enqueue(26), enqueue(2), dequeue(), dequeue(), enqueue(85), dequeue(), dequeue()</li>
+          <li>Write (i) dequeue output sequence (ii) final queue content (front→rear).</li>
+        </ol>
+
+        <h3>C) Circular queue reasoning</h3>
+        <ol>
+          <li>Explain why front==rear is ambiguous if you only store indices.</li>
+          <li>Give 2 fixes (size variable and one-empty-slot) with full/empty conditions.</li>
+          <li>Capacity \(m\) using one-empty-slot: what is max stored elements?</li>
+        </ol>
+
+        <h3>D) Linked list coding</h3>
+        <ol>
+          <li>Write in-place reverse of a singly linked list.</li>
+          <li>Write Floyd cycle detection.</li>
+          <li>Delete a node in a doubly linked list given a pointer to it (handle ends).</li>
+        </ol>
+
+        <h3>E) Amortized proofs</h3>
+        <ol>
+          <li>Prove dynamic array append is amortized \(O(1)\) under doubling (short).</li>
+          <li>Prove two-stack queue is amortized \(O(1)\) (short).</li>
+        </ol>
+
+        <div class="hr"></div>
+
+        <h3>Answer key (open only after attempting)</h3>
+        <details>
+          <summary>Show answers</summary>
+
+          <h3>A)</h3>
+          <ul>
+            <li>Pop outputs: <strong>5, 2, 26, 85, 3</strong></li>
+            <li>Final stack: <strong>[12]</strong></li>
+          </ul>
+
+          <h3>B)</h3>
+          <ul>
+            <li>Dequeue outputs: <strong>12, 3, 5, 26, 2</strong></li>
+            <li>Final queue: <strong>empty</strong></li>
+          </ul>
+
+          <h3>C)</h3>
+          <ul>
+            <li>Ambiguity: front==rear could mean empty or full.</li>
+            <li>Fix 1 (size): empty size=0, full size=m.</li>
+            <li>Fix 2 (one-empty-slot): empty front==rear, full (rear+1)%m==front.</li>
+            <li>Max stored: <strong>\(m-1\)</strong>.</li>
+          </ul>
+
+          <h3>D)</h3>
+          <ul>
+            <li>Reverse: <code>prev/cur/nxt</code> loop; time \(\Theta(n)\), space \(\Theta(1)\).</li>
+            <li>Cycle: Floyd; time \(\Theta(n)\), space \(\Theta(1)\).</li>
+            <li>Doubly delete: update <code>prev.next</code> and <code>next.prev</code> if they exist; if node is head/tail update external pointers.</li>
+          </ul>
+
+          <h3>E)</h3>
+          <ul>
+            <li>Dynamic array: total copies form geometric series <(\(2m\)); total \(O(m)\); amortized \(O(1)\).</li>
+            <li>Two stacks: each element causes ≤4 stack ops total; total \(O(m)\); amortized \(O(1)\).</li>
+          </ul>
+        </details>
+
+        <div class="footer muted">
+          If you can do traces + circular queue conventions + reverse/cycle + amortized proofs cleanly, you’re A-range for Basic DS.
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

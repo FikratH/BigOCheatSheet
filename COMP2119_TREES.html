@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trees Cheat Sheet (A‑Range) — COMP2119</title>
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: { 
+        inlineMath: [['\\(','\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-main: #f8fafc;
+      --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      --card-bg: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent-primary: #0ea5e9;
+      --accent-secondary: #8b5cf6;
+      --accent-teal: #14b8a6;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --code-bg: #1e293b;
+      --code-text: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+    * {box-sizing: border-box;margin: 0;padding: 0;}
+    html {overflow-x: hidden;width: 100%;scroll-behavior: smooth;}
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+      width: 100%;
+    }
+    header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+      color: white;
+      padding: 3rem 2rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;left: 0;right: 0;bottom: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .wrap {max-width: 1200px;margin: 0 auto;padding: 0 1.5rem;position: relative;z-index: 1;width: 100%;overflow-x: hidden;}
+    h1 {margin: 0 0 0.75rem;font-size: 2.5rem;font-weight: 800;letter-spacing: -0.5px;text-shadow: 2px 2px 4px rgba(0,0,0,0.1);}
+    .subtitle {color: rgba(255,255,255,0.9);margin: 0 0 1.5rem;font-size: 1.1rem;line-height: 1.6;font-weight: 300;}
+    .pillbar {display: flex;flex-wrap: wrap;gap: 0.75rem;margin-top: 1.5rem;}
+    .pill {background: rgba(255,255,255,0.15);backdrop-filter: blur(10px);border: 1px solid rgba(255,255,255,0.2);padding: 0.5rem 1rem;border-radius: 50px;color: rgba(255,255,255,0.95);font-size: 0.85rem;font-weight: 500;transition: all 0.2s;}
+    .pill:hover {background: rgba(255,255,255,0.25);transform: translateY(-1px);}
+    .pill strong {color: white;font-weight: 700;}
+    nav {margin-top: 1.5rem;display: flex;flex-wrap: wrap;gap: 1rem;}
+    nav a {color: white;text-decoration: none;background: rgba(255,255,255,0.1);padding: 0.5rem 1rem;border-radius: 8px;font-size: 0.9rem;font-weight: 500;transition: all 0.2s;border: 1px solid rgba(255,255,255,0.2);}
+    nav a:hover {background: rgba(255,255,255,0.2);transform: translateY(-2px);box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
+    main {padding: 2.5rem 0 4rem;width: 100%;overflow-x: hidden;}
+    .grid {display: grid;grid-template-columns: 1fr;gap: 1.5rem;width: 100%;max-width: 100%;}
+    @media (min-width: 900px) {.grid {grid-template-columns: 1.2fr 0.8fr;}}
+    .card {background: var(--card-bg);border: 1px solid var(--border-light);border-radius: 16px;padding: 2rem;box-shadow: var(--shadow-md);transition: all 0.3s;page-break-inside: avoid;break-inside: avoid;width: 100%;overflow: hidden;}
+    .card:hover {box-shadow: var(--shadow-lg);transform: translateY(-2px);}
+    h2 {margin: 0 0 1.5rem;font-size: 1.75rem;font-weight: 700;color: var(--accent-primary);border-bottom: 3px solid var(--accent-primary);padding-bottom: 0.5rem;display: inline-block;page-break-after: avoid;break-after: avoid;}
+    h3 {margin: 1.75rem 0 0.75rem;font-size: 1.25rem;font-weight: 600;color: var(--accent-secondary);page-break-after: avoid;break-after: avoid;}
+    p {margin: 0.75rem 0;color: var(--text-secondary);line-height: 1.8;overflow-wrap: break-word;word-wrap: break-word;hyphens: auto;}
+    .muted {color: var(--text-muted);}
+    .hr {height: 1px;background: var(--border-light);margin: 1.5rem 0;border: none;}
+    code, pre {font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;}
+    code {background: #f1f5f9;color: #8b5cf6;padding: 0.2rem 0.5rem;border-radius: 4px;font-size: 0.9em;font-weight: 500;}
+    pre {background: var(--code-bg);color: var(--code-text);border: 1px solid var(--border-medium);border-radius: 12px;padding: 1.25rem;overflow-x: auto;margin: 1.25rem 0;font-size: 0.875rem;line-height: 1.6;box-shadow: var(--shadow-sm);page-break-inside: avoid;break-inside: avoid;max-width: 100%;word-wrap: break-word;white-space: pre-wrap;}
+    pre code {background: none;color: inherit;padding: 0;font-size: inherit;}
+    .callout {border-left: 4px solid var(--accent-teal);background: rgba(20, 184, 166, 0.08);padding: 1rem 1.25rem;border-radius: 8px;margin: 1.25rem 0;page-break-inside: avoid;break-inside: avoid;max-width: 100%;overflow-wrap: break-word;word-wrap: break-word;}
+    .callout.warn {border-left-color: var(--warn);background: rgba(245, 158, 11, 0.08);}
+    .callout.bad {border-left-color: var(--danger);background: rgba(239, 68, 68, 0.08);}
+    .callout.good {border-left-color: var(--success);background: rgba(16, 185, 129, 0.08);}
+    .callout strong {color: var(--text-primary);font-weight: 700;}
+    table {width: 100%;border-collapse: separate;border-spacing: 0;overflow: hidden;border-radius: 12px;border: 1px solid var(--border-light);margin: 1.25rem 0;font-size: 0.9rem;box-shadow: var(--shadow-sm);page-break-inside: avoid;break-inside: avoid;display: block;overflow-x: auto;max-width: 100%;}
+    table tbody, table thead {display: table;width: 100%;}
+    th, td {padding: 0.875rem 1rem;border-bottom: 1px solid var(--border-light);vertical-align: top;text-align: left;}
+    th {background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);color: var(--text-primary);font-weight: 700;font-size: 0.875rem;text-transform: uppercase;letter-spacing: 0.5px;}
+    td {color: var(--text-secondary);}
+    tr:last-child td {border-bottom: none;}
+    tbody tr:hover {background: rgba(14, 165, 233, 0.04);}
+    .k {display: inline-block;padding: 0.25rem 0.75rem;border-radius: 50px;background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);border: 1px solid #93c5fd;color: #1e40af;font-size: 0.8rem;font-weight: 600;margin-right: 0.5rem;}
+    .small {font-size: 0.875rem;}
+    ol, ul {margin: 0.75rem 0;padding-left: 1.5rem;}
+    li {margin: 0.5rem 0;color: var(--text-secondary);line-height: 1.7;}
+    details {border: 1px solid var(--border-light);border-radius: 12px;padding: 1rem 1.25rem;background: #fafafa;margin: 1.25rem 0;page-break-inside: avoid;break-inside: avoid;}
+    details[open] {background: white;box-shadow: var(--shadow-sm);}
+    summary {cursor: pointer;color: var(--accent-secondary);font-weight: 700;font-size: 1rem;padding: 0.5rem 0;user-select: none;transition: color 0.2s;}
+    summary:hover {color: var(--accent-primary);}
+    details[open] summary {margin-bottom: 1rem;padding-bottom: 1rem;border-bottom: 1px solid var(--border-light);}
+    .toc {display: flex;flex-direction: column;gap: 0.75rem;}
+    .toc a {color: var(--text-secondary);text-decoration: none;font-size: 0.9rem;padding: 0.5rem 0.75rem;border-radius: 6px;transition: all 0.2s;display: block;}
+    .toc a:hover {color: var(--accent-primary);background: rgba(14, 165, 233, 0.08);padding-left: 1rem;}
+    .footer {margin-top: 1.5rem;padding: 1rem;background: rgba(14, 165, 233, 0.05);border-radius: 8px;color: var(--text-muted);font-size: 0.875rem;line-height: 1.6;}
+    .twoCol {display: grid;grid-template-columns: 1fr;gap: 1rem;}
+    @media (min-width: 720px) {.twoCol {grid-template-columns: 1fr 1fr;}}
+    .badge {display: inline-block;padding: 0.25rem 0.75rem;border-radius: 50px;background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);border: 1px solid #93c5fd;color: #1e40af;font-size: 0.8rem;font-weight: 600;margin-right: 0.5rem;}
+    mjx-container, mjx-math, .MathJax {color: var(--text-primary) !important;max-width: 100%;overflow-x: auto;overflow-y: hidden;}
+    mjx-container[display="true"] {overflow-x: auto;overflow-y: hidden;}
+    @media (max-width: 768px) {h1 {font-size: 2rem;}h2 {font-size: 1.5rem;}h3 {font-size: 1.125rem;}.card {padding: 1.5rem;}header {padding: 2rem 1.5rem;}table {font-size: 0.8rem;}th, td {padding: 0.625rem 0.75rem;}}
+    @media print {* {overflow: visible !important;}body {background: white;padding: 0;overflow-x: visible;width: 100%;}header {background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);-webkit-print-color-adjust: exact;print-color-adjust: exact;page-break-after: avoid;break-after: avoid;}.wrap {max-width: 100%;padding: 0 1rem;}.card {box-shadow: none;border: 1px solid var(--border-light);page-break-inside: avoid;break-inside: avoid;margin-bottom: 1.5rem;padding: 1.5rem;}.card:hover {transform: none;box-shadow: none;}h1, h2, h3, h4 {page-break-after: avoid;break-after: avoid;}h1 + p, h2 + p, h3 + p, h4 + p {page-break-before: avoid;break-before: avoid;}h2 {page-break-before: auto;break-before: auto;margin-top: 1rem;}.callout, details, table, pre {page-break-inside: avoid;break-inside: avoid;max-width: 100%;}pre {background: var(--code-bg) !important;color: var(--code-text) !important;-webkit-print-color-adjust: exact;print-color-adjust: exact;white-space: pre-wrap;word-wrap: break-word;overflow: visible;}table {page-break-inside: avoid;break-inside: avoid;font-size: 0.8rem;}th, td {padding: 0.5rem 0.75rem;}details {border: 1px solid var(--border-light);page-break-inside: avoid;}details[open] {page-break-inside: avoid;}summary {cursor: default;}.grid {grid-template-columns: 1fr;gap: 1rem;}nav {page-break-after: avoid;break-after: avoid;}nav a {page-break-inside: avoid;break-inside: avoid;}p, ul, ol {orphans: 3;widows: 3;}mjx-container, mjx-math, .MathJax {color: #000000 !important;overflow: visible !important;}.pill {-webkit-print-color-adjust: exact;print-color-adjust: exact;}.pillbar {page-break-inside: avoid;break-inside: avoid;}aside {page-break-inside: avoid;break-inside: avoid;}}
+    ::-webkit-scrollbar {width: 10px;height: 10px;}
+    ::-webkit-scrollbar-track {background: #f1f5f9;}
+    ::-webkit-scrollbar-thumb {background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);border-radius: 5px;}
+    ::-webkit-scrollbar-thumb:hover {background: linear-gradient(135deg, #0284c7 0%, #7c3aed 100%);}
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <h1>Trees Cheat Sheet (A‑Range)</h1>
+    <p class="subtitle">Binary trees, rooted trees, traversals, reconstruction from orders, and the exact proof/algorithm templates COMP2119 loves.</p>
+    <div class="pillbar">
+      <span class="pill"><strong>Core skills</strong>: traversal order, recursion base cases, build from (pre+in)/(post+in)</span>
+      <span class="pill"><strong>Must know</strong>: tree edges \(=n-1\), full binary tree leaves \(=I+1\)</span>
+      <span class="pill"><strong>Exam traps</strong>: “height” convention, uniqueness conditions, wrong split in inorder</span>
+      <span class="pill"><strong>Implementation</strong>: lc/rs representation for general trees</span>
+    </div>
+    <nav>
+      <a href="#defs">Terminology</a>
+      <a href="#props">Key properties</a>
+      <a href="#trav">Traversals</a>
+      <a href="#recon">Reconstruction</a>
+      <a href="#algos">Standard algorithms</a>
+      <a href="#general">General trees (lc/rs)</a>
+      <a href="#proofs">Proof templates</a>
+      <a href="#hard">Hard traps</a>
+      <a href="#practice">Hard practice set</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="grid">
+
+      <section class="card" id="defs">
+        <h2>1) Terminology — say it precisely (marks are picky)</h2>
+
+        <h3>Basic definitions</h3>
+        <ul>
+          <li><strong>Tree</strong>: connected, acyclic graph. If it has \(n\) vertices then it has exactly \(n-1\) edges.</li>
+          <li><strong>Rooted tree</strong>: one node is the root; every other node has exactly one parent.</li>
+          <li><strong>Child / parent</strong>: directed away from the root.</li>
+          <li><strong>Leaf</strong>: node with 0 children.</li>
+          <li><strong>Depth</strong>(v): number of edges on the path root→v.</li>
+          <li><strong>Height</strong>(v): length (edges) of the longest downward path from v to a leaf.</li>
+        </ul>
+
+        <div class="callout warn">
+          <strong>Height convention trap:</strong> some questions use height(empty)=−1 and height(leaf)=0, others use height(empty)=0 and height(leaf)=1.
+          Always state the convention you are using before giving a number.
+        </div>
+
+        <h3>Binary tree types (don’t mix them up)</h3>
+        <ul>
+          <li><strong>Binary tree</strong>: each node has at most 2 children (left/right). Nothing about key ordering.</li>
+          <li><strong>Full</strong> binary tree: every internal node has exactly 2 children.</li>
+          <li><strong>Perfect</strong> binary tree: full AND all leaves at the same depth.</li>
+          <li><strong>Complete</strong> binary tree: all levels full except possibly last, which is filled left-to-right (heap shape).</li>
+        </ul>
+      </section>
+
+      <section class="card" id="props">
+        <h2>2) Key properties you should be able to use in proofs</h2>
+
+        <h3>Always-true facts</h3>
+        <ul>
+          <li>Any tree with \(n\) nodes has \(n-1\) edges.</li>
+          <li>In a rooted tree: \(\sum_{v} 	ext{children}(v) = n-1\).</li>
+          <li>In a binary tree: number of NULL child pointers is \(n+1\) (useful in pointer-count proofs).</li>
+        </ul>
+
+        <h3>Full binary tree leaves formula (high frequency)</h3>
+        <p>If a non-empty full binary tree has \(I\) internal nodes and \(L\) leaves, then</p>
+        <div class="callout">
+          \[
+            L = I + 1.
+          \]
+        </div>
+        <p class="muted small"><strong>Fast proof:</strong> Every internal node contributes exactly 2 child-edges so total edges \(E=2I\). But any tree has \(E=n-1=(I+L)-1\) edges. Hence \(2I=I+L-1\Rightarrow L=I+1\).</p>
+
+        <h3>Bounds with height</h3>
+        <ul>
+          <li>Max nodes in height \(h\) binary tree: \(2^{h+1}-1\) (if height(leaf)=0).</li>
+          <li>Min nodes in height \(h\) binary tree: \(h+1\) (a chain).</li>
+          <li>Perfect tree: nodes at depth \(d\) is \(2^d\), total is \(2^{h+1}-1\).</li>
+        </ul>
+
+        <div class="callout">
+          <strong>Exam line:</strong> If a binary tree has \(n\) nodes, then its height is between \(\lfloor \log_2 n 
+floor\) and \(n-1\) (depending on balance).
+        </div>
+      </section>
+
+      <section class="card" id="trav">
+        <h2>3) Traversals — do these instantly (and don’t mess up the order)</h2>
+
+        <h3>Binary tree traversals</h3>
+        <div class="twoCol">
+          <div>
+            <ul>
+              <li><strong>Preorder</strong>: root, left, right</li>
+              <li><strong>Inorder</strong>: left, root, right</li>
+              <li><strong>Postorder</strong>: left, right, root</li>
+              <li><strong>Level-order</strong>: BFS by levels (queue)</li>
+            </ul>
+          </div>
+          <div class="callout">
+            <strong>BST reminder:</strong> Only for a BST, inorder outputs sorted keys. For a plain binary tree, inorder is not “sorted”.
+          </div>
+        </div>
+
+        <h3>DFS templates (recursive)</h3>
+<pre><code>// Preorder
+pre(u):
+  if u == NULL: return
+  visit(u)
+  pre(u.left)
+  pre(u.right)
+
+// Inorder
+in(u):
+  if u == NULL: return
+  in(u.left)
+  visit(u)
+  in(u.right)
+
+// Postorder
+post(u):
+  if u == NULL: return
+  post(u.left)
+  post(u.right)
+  visit(u)
+</code></pre>
+
+        <h3>Level-order (BFS) template</h3>
+<pre><code>levelOrder(root):
+  if root == NULL: return
+  Q = empty queue
+  enqueue(Q, root)
+  while not empty(Q):
+    u = dequeue(Q)
+    visit(u)
+    if u.left  != NULL: enqueue(Q, u.left)
+    if u.right != NULL: enqueue(Q, u.right)
+</code></pre>
+
+        <div class="callout warn">
+          <strong>Order rule:</strong> if the question says “visit children in increasing order / left-to-right”, do exactly that. You lose marks for wrong tie-breaking.
+        </div>
+
+        <h3>Iterative inorder (very common coding question)</h3>
+<pre><code>iterInorder(root):
+  S = empty stack
+  u = root
+  while u != NULL or not empty(S):
+    while u != NULL:
+      push(S, u)
+      u = u.left
+    u = pop(S)
+    visit(u)
+    u = u.right
+</code></pre>
+        <p class="muted small">Time \(O(n)\). Stack size \(O(h)\) (height).</p>
+      </section>
+
+      <section class="card" id="recon">
+        <h2>4) Reconstruction from traversal orders (A-range topic)</h2>
+
+        <h3>Uniqueness rules (memorize)</h3>
+        <ul>
+          <li><strong>Preorder + Inorder</strong> uniquely determines the binary tree (distinct labels).</li>
+          <li><strong>Postorder + Inorder</strong> uniquely determines the binary tree (distinct labels).</li>
+          <li><strong>Preorder + Postorder</strong> is <span class="bad"><strong>not unique</strong></span> in general.
+              It becomes unique if you are also told the tree is <strong>full</strong>.</li>
+        </ul>
+
+        <h3>Pre + In reconstruction algorithm (the exact exam template)</h3>
+        <ol>
+          <li>Root is the next element in preorder.</li>
+          <li>Find root position in inorder → splits left-subtree inorder and right-subtree inorder.</li>
+          <li>Recurse on the left range, then on the right range.</li>
+        </ol>
+
+        <div class="callout">
+          <strong>Write this clearly:</strong> use a hashmap \(pos[x]\) for inorder indices to get total \(O(n)\) time instead of \(O(n^2)\).
+        </div>
+
+<pre><code>// preorder[preIdx] is next root
+build(inL, inR):
+  if inL &gt; inR: return NULL
+  rootVal = preorder[preIdx]; preIdx++
+  k = pos[rootVal]               // inorder index
+  root = new Node(rootVal)
+  root.left  = build(inL, k-1)
+  root.right = build(k+1, inR)
+  return root
+</code></pre>
+
+        <h3>Common reconstruction marking checklist</h3>
+        <ul>
+          <li>You must show the inorder split at each step.</li>
+          <li>Preorder consumes roots in order — do not “re-scan” preorder for subtree.</li>
+          <li>State the complexity and the data structure (hashmap) used to reach it.</li>
+        </ul>
+
+        <div class="callout warn">
+          <strong>Fast sanity check:</strong> the inorder of your drawn tree must match the given inorder exactly.
+        </div>
+      </section>
+
+      <section class="card" id="algos">
+        <h2>5) Standard tree algorithms (write them from memory)</h2>
+
+        <h3>Size, height, leaf count</h3>
+<pre><code>size(u):
+  if u == NULL: return 0
+  return 1 + size(u.left) + size(u.right)
+
+height(u):              // height(empty)=-1, height(leaf)=0
+  if u == NULL: return -1
+  return 1 + max(height(u.left), height(u.right))
+
+countLeaves(u):
+  if u == NULL: return 0
+  if u.left == NULL and u.right == NULL: return 1
+  return countLeaves(u.left) + countLeaves(u.right)
+</code></pre>
+
+        <h3>Mirror (swap left/right everywhere)</h3>
+<pre><code>mirror(u):
+  if u == NULL: return
+  swap(u.left, u.right)
+  mirror(u.left)
+  mirror(u.right)
+</code></pre>
+        <p class="muted small">Time \(O(n)\). Recursion depth \(O(h)\).</p>
+
+        <h3>Check if two trees are identical</h3>
+<pre><code>same(a, b):
+  if a == NULL and b == NULL: return true
+  if a == NULL or  b == NULL: return false
+  if a.key != b.key: return false
+  return same(a.left, b.left) and same(a.right, b.right)
+</code></pre>
+
+        <h3>Expression tree evaluation (classic)</h3>
+        <p class="small">Postorder naturally evaluates bottom-up.</p>
+<pre><code>eval(u):
+  if u is a number: return u.value
+  x = eval(u.left)
+  y = eval(u.right)
+  return apply(u.op, x, y)
+</code></pre>
+
+        <div class="callout">
+          <strong>Explain complexity properly:</strong> for any “visit each node once” recursion, time is \(\Theta(n)\).
+        </div>
+      </section>
+
+      <section class="card" id="general">
+        <h2>6) General rooted trees: left-child / right-sibling (lc/rs)</h2>
+
+        <p>COMP2119 often represents a general tree node like this:</p>
+
+<pre><code>struct tree_node {
+  int value;
+  tree_node* lc; // leftmost child
+  tree_node* rs; // right sibling
+};</code></pre>
+
+        <h3>How to iterate children of a node</h3>
+<pre><code>p = u.lc
+while p != NULL:
+  // p is a child of u
+  p = p.rs</code></pre>
+
+        <h3>Example: sum values in a general tree</h3>
+<pre><code>sum(u):
+  if u == NULL: return 0
+  total = u.value
+  p = u.lc
+  while p != NULL:
+    total += sum(p)
+    p = p.rs
+  return total
+</code></pre>
+
+        <div class="callout warn">
+          <strong>Trap:</strong> lc points down; rs points sideways. Students often recurse on rs incorrectly (double-count) or forget it (miss siblings).
+        </div>
+      </section>
+
+      <section class="card" id="proofs">
+        <h2>7) Proof templates (short, strict, and exam-correct)</h2>
+
+        <h3>A) Degree/edge counting template</h3>
+        <p>Use these two equations (rooted tree):</p>
+        <div class="callout">
+          \[
+            \sum_v 	ext{children}(v) = n-1,\quad \sum_i x_i = n
+          \]
+          where \(x_i\) is number of nodes with \(i\) children.
+        </div>
+
+        <h3>B) Full binary tree leaves proof (write like this)</h3>
+        <p>Let \(I\) be internal nodes and \(L\) leaves. A full binary tree has exactly 2 outgoing child-edges from each internal node, so total edges \(E=2I\).
+           But any tree has \(E=n-1=(I+L)-1\). Hence \(2I=I+L-1\Rightarrow L=I+1\).</p>
+
+        <h3>C) “Every node visited once” runtime proof</h3>
+        <ul>
+          <li>Show each call does \(O(1)\) local work.</li>
+          <li>Each node triggers exactly one call.</li>
+          <li>Total time \(=O(1)\cdot n=\Theta(n)\).</li>
+        </ul>
+      </section>
+
+      <section class="card" id="hard">
+        <h2>8) Hard traps (this is where marks disappear)</h2>
+
+        <h3>Traversal mistakes</h3>
+        <ul>
+          <li>Mixing preorder vs inorder vs postorder (memorize the three sequences).</li>
+          <li>Not following the specified child visiting order.</li>
+          <li>For iterative inorder: forgetting the outer condition “u != NULL OR stack not empty”.</li>
+        </ul>
+
+        <h3>Reconstruction mistakes</h3>
+        <ul>
+          <li>Splitting the wrong side in inorder (root must appear exactly once).</li>
+          <li>Not using a global preorder index (or not passing it by reference).</li>
+          <li>Claiming pre+post is unique without extra conditions.</li>
+          <li>Forgetting to state complexity and how you achieved it.</li>
+        </ul>
+
+        <div class="callout warn">
+          <strong>Strict exam habit:</strong> when asked to “draw the tree”, also write the traversal(s) of your drawn tree to verify.
+        </div>
+      </section>
+
+      <section class="card" id="practice">
+        <h2>9) Hard practice set (COMP2119-style) — with answer key</h2>
+
+        <h3>A) Traversals</h3>
+        <ol>
+          <li>Given the tree: root 5; left child 3 with children 1 and 4; right child 8 with children 7 and 9. Write preorder, inorder, postorder, level-order.</li>
+          <li>Write an iterative inorder algorithm using one stack. State time and extra space.</li>
+        </ol>
+
+        <h3>B) Reconstruction (pre + in)</h3>
+        <p class="small">Preorder: 1,2,4,5,7,3,6,8,9,10. Inorder: 4,2,7,5,1,3,9,8,10,6.</p>
+        <ol>
+          <li>Draw the tree.</li>
+          <li>Show the first two splits explicitly (write inorder left/right ranges).</li>
+          <li>Give time complexity with and without a hashmap of inorder positions.</li>
+        </ol>
+
+        <h3>C) Proof</h3>
+        <ol>
+          <li>Prove: in any non-empty full binary tree, \(L=I+1\).</li>
+          <li>True/False (justify): Preorder + Postorder uniquely determines a binary tree.</li>
+        </ol>
+
+        <h3>D) Code-completion (very exam-like)</h3>
+<pre><code>Node* buildTree(int inL, int inR, int& preIdx) {
+  if (__________) return NULL;
+  int rootVal = preorder[preIdx];
+  preIdx++;
+  int k = pos[rootVal];
+  Node* root = new Node(rootVal);
+  root-&gt;left  = buildTree(__________, __________, preIdx);
+  root-&gt;right = buildTree(__________, __________, preIdx);
+  return root;
+}</code></pre>
+
+        <div class="hr"></div>
+
+        <h3>Answer key (open only after attempting)</h3>
+        <details>
+          <summary>Show answers</summary>
+
+          <h3>A)</h3>
+          <ul>
+            <li>Preorder: 5,3,1,4,8,7,9</li>
+            <li>Inorder: 1,3,4,5,7,8,9</li>
+            <li>Postorder: 1,4,3,7,9,8,5</li>
+            <li>Level-order: 5,3,8,1,4,7,9</li>
+            <li>Iterative inorder: time \(O(n)\), extra space \(O(h)\).</li>
+          </ul>
+
+          <h3>B)</h3>
+          <ul>
+            <li>Root = 1 (from preorder). Inorder splits as left [4,2,7,5] and right [3,9,8,10,6].</li>
+            <li>Next root = 2. Inorder left part [4,2,7,5] splits as left [4] and right [7,5].</li>
+            <li>With hashmap \(pos\): total \(O(n)\). Without hashmap (linear scan for k): worst \(O(n^2)\).</li>
+          </ul>
+
+          <h3>C)</h3>
+          <ul>
+            <li>Proof via edges: \(E=2I\) and \(E=I+L-1\Rightarrow L=I+1\).</li>
+            <li>False in general; becomes true if the tree is known to be full (and labels distinct).</li>
+          </ul>
+
+          <h3>D)</h3>
+          <ul>
+            <li>Base case: <code>inL &gt; inR</code></li>
+            <li>Left: <code>buildTree(inL, k-1, preIdx)</code></li>
+            <li>Right: <code>buildTree(k+1, inR, preIdx)</code></li>
+          </ul>
+        </details>
+
+        <div class="footer muted">
+          If you can do reconstruction + proof + iterative traversal without errors, you’re in A-range territory for trees.
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
