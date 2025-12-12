@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hashing Cheat Sheet (A-Range) — COMP2119</title>
+
+  <!-- MathJax -->
+  <script>
+    window.MathJax = {
+      tex: { 
+        inlineMath: [['\\(','\\)'], ['$', '$']],
+        displayMath: [['\\[', '\\]'], ['$$', '$$']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg-main: #f8fafc;
+      --bg-gradient: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      --card-bg: #ffffff;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent-primary: #0ea5e9;
+      --accent-secondary: #8b5cf6;
+      --accent-teal: #14b8a6;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --success: #10b981;
+      --border-light: #e2e8f0;
+      --border-medium: #cbd5e1;
+      --code-bg: #1e293b;
+      --code-text: #e2e8f0;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      overflow-x: hidden;
+      width: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 0;
+      overflow-x: hidden;
+      width: 100%;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+      color: white;
+      padding: 3rem 2rem;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(255,255,255,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      overflow-x: hidden;
+    }
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .subtitle {
+      color: rgba(255,255,255,0.9);
+      margin: 0 0 1.5rem;
+      font-size: 1.1rem;
+      line-height: 1.6;
+      font-weight: 300;
+    }
+
+    .pillbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.5rem;
+    }
+
+    .pill {
+      background: rgba(255,255,255,0.15);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      color: rgba(255,255,255,0.95);
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .pill:hover {
+      background: rgba(255,255,255,0.25);
+      transform: translateY(-1px);
+    }
+
+    .pill strong {
+      color: white;
+      font-weight: 700;
+    }
+
+    nav {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255,255,255,0.1);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    nav a:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    main {
+      padding: 2.5rem 0 4rem;
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 100%;
+    }
+
+    @media (min-width: 900px) {
+      .grid {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-light);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: var(--shadow-md);
+      transition: all 0.3s;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    h2 {
+      margin: 0 0 1.5rem;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      border-bottom: 3px solid var(--accent-primary);
+      padding-bottom: 0.5rem;
+      display: inline-block;
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    h3 {
+      margin: 1.75rem 0 0.75rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--accent-secondary);
+      page-break-after: avoid;
+      break-after: avoid;
+    }
+
+    p {
+      margin: 0.75rem 0;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+      hyphens: auto;
+    }
+
+    .muted {
+      color: var(--text-muted);
+    }
+
+    .hr {
+      height: 1px;
+      background: var(--border-light);
+      margin: 1.5rem 0;
+      border: none;
+    }
+    code, pre {
+      font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    }
+
+    code {
+      background: #f1f5f9;
+      color: #8b5cf6;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9em;
+      font-weight: 500;
+    }
+
+    pre {
+      background: var(--code-bg);
+      color: var(--code-text);
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin: 1.25rem 0;
+      font-size: 0.875rem;
+      line-height: 1.6;
+      box-shadow: var(--shadow-sm);
+      page-break-inside: avoid;
+      break-inside: avoid;
+      max-width: 100%;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    pre code {
+      background: none;
+      color: inherit;
+      padding: 0;
+      font-size: inherit;
+    }
+
+    .callout {
+      border-left: 4px solid var(--accent-teal);
+      background: rgba(20, 184, 166, 0.08);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin: 1.25rem 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-wrap: break-word;
+    }
+
+    .callout.warn {
+      border-left-color: var(--warn);
+      background: rgba(245, 158, 11, 0.08);
+    }
+
+    .callout.bad {
+      border-left-color: var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .callout.good {
+      border-left-color: var(--success);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .callout strong {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      margin: 1.25rem 0;
+      font-size: 0.9rem;
+      box-shadow: var(--shadow-sm);
+      page-break-inside: avoid;
+      break-inside: avoid;
+      display: block;
+      overflow-x: auto;
+      max-width: 100%;
+    }
+
+    table tbody,
+    table thead {
+      display: table;
+      width: 100%;
+    }
+
+    th, td {
+      padding: 0.875rem 1rem;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      color: var(--text-primary);
+      font-weight: 700;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      color: var(--text-secondary);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tbody tr:hover {
+      background: rgba(14, 165, 233, 0.04);
+    }
+    .k {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    .small {
+      font-size: 0.875rem;
+    }
+
+    ol, ul {
+      margin: 0.75rem 0;
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin: 0.5rem 0;
+      color: var(--text-secondary);
+      line-height: 1.7;
+    }
+
+    details {
+      border: 1px solid var(--border-light);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      background: #fafafa;
+      margin: 1.25rem 0;
+      page-break-inside: avoid;
+      break-inside: avoid;
+    }
+
+    details[open] {
+      background: white;
+      box-shadow: var(--shadow-sm);
+    }
+
+    summary {
+      cursor: pointer;
+      color: var(--accent-secondary);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.5rem 0;
+      user-select: none;
+      transition: color 0.2s;
+    }
+
+    summary:hover {
+      color: var(--accent-primary);
+    }
+
+    details[open] summary {
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .toc {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .toc a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+      display: block;
+    }
+
+    .toc a:hover {
+      color: var(--accent-primary);
+      background: rgba(14, 165, 233, 0.08);
+      padding-left: 1rem;
+    }
+
+    .footer {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: rgba(14, 165, 233, 0.05);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    .twoCol {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 720px) {
+      .twoCol {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+      border: 1px solid #93c5fd;
+      color: #1e40af;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+
+    /* MathJax visibility and overflow fix */
+    mjx-container, mjx-math, .MathJax {
+      color: var(--text-primary) !important;
+      max-width: 100%;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    mjx-container[display="true"] {
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        font-size: 1.125rem;
+      }
+
+      .card {
+        padding: 1.5rem;
+      }
+
+      header {
+        padding: 2rem 1.5rem;
+      }
+
+      table {
+        font-size: 0.8rem;
+      }
+
+      th, td {
+        padding: 0.625rem 0.75rem;
+      }
+    }
+
+    /* Print/PDF export styles */
+    @media print {
+      * {
+        overflow: visible !important;
+      }
+
+      body {
+        background: white;
+        padding: 0;
+        overflow-x: visible;
+        width: 100%;
+      }
+
+      header {
+        background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      .wrap {
+        max-width: 100%;
+        padding: 0 1rem;
+      }
+
+      .card {
+        box-shadow: none;
+        border: 1px solid var(--border-light);
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+      }
+
+      .card:hover {
+        transform: none;
+        box-shadow: none;
+      }
+
+      h1, h2, h3, h4 {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      h1 + p, h2 + p, h3 + p, h4 + p {
+        page-break-before: avoid;
+        break-before: avoid;
+      }
+
+      h2 {
+        page-break-before: auto;
+        break-before: auto;
+        margin-top: 1rem;
+      }
+
+      .callout, details, table, pre {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        max-width: 100%;
+      }
+
+      pre {
+        background: var(--code-bg) !important;
+        color: var(--code-text) !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow: visible;
+      }
+
+      table {
+        page-break-inside: avoid;
+        break-inside: avoid;
+        font-size: 0.8rem;
+      }
+
+      th, td {
+        padding: 0.5rem 0.75rem;
+      }
+
+      details {
+        border: 1px solid var(--border-light);
+        page-break-inside: avoid;
+      }
+
+      details[open] {
+        page-break-inside: avoid;
+      }
+
+      summary {
+        cursor: default;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      nav {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+
+      nav a {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      p, ul, ol {
+        orphans: 3;
+        widows: 3;
+      }
+
+      mjx-container, mjx-math, .MathJax {
+        color: #000000 !important;
+        overflow: visible !important;
+      }
+
+      .pill {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+
+      .pillbar {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+
+      aside {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+    }
+
+    /* Scrollbar styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(135deg, #0284c7 0%, #7c3aed 100%);
+    }
+  </style>
+</head>
+
+<body>
+<header>
+  <div class="wrap">
+    <h1>Hashing Cheat Sheet (A-Range)</h1>
+    <p class="subtitle">Everything you need for COMP2119-style hashing questions: building tables, tracing searches (incl. tombstones), load factor design, clustering, and tough edge cases.</p>
+    <div class="pillbar">
+      <span class="pill"><strong>Core skills</strong>: insert trace, search trace, delete+tombstones</span>
+      <span class="pill"><strong>Must know</strong>: load factor \(\alpha=n/m\)</span>
+      <span class="pill"><strong>Open addressing</strong>: stop at EMPTY, not at DELETED</span>
+      <span class="pill"><strong>Double hashing</strong>: step must be coprime to table size</span>
+    </div>
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#load">Load factor</a>
+      <a href="#chaining">Chaining</a>
+      <a href="#open">Open addressing</a>
+      <a href="#search">Search & probes</a>
+      <a href="#delete">Deletion & tombstones</a>
+      <a href="#design">Design & rehash</a>
+      <a href="#hard">Hard traps</a>
+      <a href="#practice">Hard practice set</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div class="grid">
+      <!-- MAIN -->
+      <section class="card" id="overview">
+        <h2>1) What hashing is (in 30 seconds)</h2>
+        <p>A <strong>hash table</strong> stores keys in an array of size \(m\). A <strong>hash function</strong> maps a key \(k\) to an index:</p>
+        <div class="callout good">
+          \(\text{index} = h(k)\in\{0,1,\dots,m-1\}\).
+        </div>
+        <p>Goal: average \(O(1)\) time for <strong>insert</strong>, <strong>search</strong>, <strong>delete</strong>.</p>
+
+        <h3>The only real problem: collisions</h3>
+        <p>Two different keys can map to the same index: \(h(k_1)=h(k_2)\). Collision handling must be specified.</p>
+
+        <div class="twoCol">
+          <div class="callout">
+            <span class="k">Chaining</span> each slot stores a list of keys.
+          </div>
+          <div class="callout">
+            <span class="k">Open addressing</span> keys stored in the array; collisions resolved by probing.
+          </div>
+        </div>
+
+        <div class="callout warn">
+          <strong>Exam pattern:</strong> Most hashing marks come from writing the correct sequence of indices (insertion/search probes) and stopping at the right time.
+        </div>
+      </section>
+
+      <!-- SIDEBAR -->
+      <aside class="card">
+        <h2>Quick TOC</h2>
+        <div class="toc">
+          <a href="#load">2) Load factor & what it means</a>
+          <a href="#chaining">3) Chaining (build + search)</a>
+          <a href="#open">4) Open addressing: linear / quadratic / double</a>
+          <a href="#search">5) Successful vs unsuccessful search (probe counting)</a>
+          <a href="#delete">6) Deletion & tombstones (big trap)</a>
+          <a href="#design">7) Choosing \(m\), primes, rehashing</a>
+          <a href="#hard">8) Hard traps & “A-range” notes</a>
+          <a href="#practice">9) Hard practice set (with answer key)</a>
+        </div>
+        <div class="hr"></div>
+        <h3>Top 7 “don’t lose marks” rules</h3>
+        <ol class="small">
+          <li>Always write indices mod \(m\).</li>
+          <li>Open addressing: \(\alpha=n/m<1\) must hold.</li>
+          <li>Search stops at <strong>EMPTY</strong>, but <strong>not</strong> at DELETED.</li>
+          <li>Linear probing causes <strong>primary clustering</strong>.</li>
+          <li>Quadratic reduces primary but can have <strong>secondary clustering</strong>.</li>
+          <li>Double hashing step must be coprime to \(m\) to avoid cycles.</li>
+          <li>If \(\alpha\) gets big (or too many tombstones) ⇒ <strong>rehash</strong>.</li>
+        </ol>
+      </aside>
+
+      <section class="card" id="load">
+        <h2>2) Load factor \(\alpha\) — the number you always compute</h2>
+        <p>Let \(n\) = number of stored keys, \(m\) = table size (slots).</p>
+        <div class="callout good">
+          \(\displaystyle \alpha=\frac{n}{m}\).
+        </div>
+
+        <table>
+          <tr><th>Method</th><th>What \(\alpha\) means</th><th>Effect on performance</th></tr>
+          <tr>
+            <td>Chaining</td>
+            <td>Average keys per bucket \(\approx \alpha\)</td>
+            <td>Expected time \(\approx O(1+\alpha)\)</td>
+          </tr>
+          <tr>
+            <td>Open addressing</td>
+            <td>Fraction of table filled</td>
+            <td>Probe counts increase sharply as \(\alpha\to 1\)</td>
+          </tr>
+        </table>
+
+        <div class="callout warn">
+          <strong>Design question template:</strong> “Store \(n\) keys with load factor \(\alpha\le 0.75\). Choose \(m\).”
+          Answer: \(m \ge \lceil n/0.75\rceil\) (often pick a nearby prime for open addressing).
+        </div>
+      </section>
+
+      <section class="card" id="chaining">
+        <h2>3) Chaining (separate chaining) — build & search</h2>
+        <h3>How it works</h3>
+        <p>Each slot holds a list (linked list / dynamic list). Collisions go into the same bucket list.</p>
+
+        <h3>Insertion rule</h3>
+        <p>Compute index \(i=h(k)\), then insert into bucket \(i\) (often at front).</p>
+
+        <h3>Search cost</h3>
+        <p>Compute \(i=h(k)\). Scan bucket list until found or end.</p>
+
+        <div class="callout">
+          <strong>Unsuccessful search</strong> in chaining scans the entire bucket list.
+          <br /><strong>Successful search</strong> scans until you hit the key.
+        </div>
+
+        <h3>Worked example (chaining)</h3>
+        <div class="callout good">
+          <span class="badge">Given</span> \(m=7\), \(h(k)=k\bmod 7\), insert \(19,26,13,48,17,24\) (front insertion).
+        </div>
+        <pre>19 -> 5: [19]
+26 -> 5: [26 -> 19]
+13 -> 6: [13]
+48 -> 6: [48 -> 13]
+17 -> 3: [17]
+24 -> 3: [24 -> 17]
+
+Final:
+0: -
+1: -
+2: -
+3: 24 -> 17
+4: -
+5: 26 -> 19
+6: 48 -> 13</pre>
+
+        <div class="callout warn">
+          <strong>Common exam detail:</strong> They may specify “insert at head” or “insert at tail”. That changes the chain order (but not which bucket each key is in).
+        </div>
+      </section>
+
+      <section class="card" id="open">
+        <h2>4) Open addressing — linear / quadratic / double hashing</h2>
+        <p>All keys must fit inside the array. On collision, follow a probe sequence:</p>
+        <div class="callout good">
+          \(\displaystyle h(k,0), h(k,1), h(k,2), \dots\)
+        </div>
+
+        <h3>Linear probing</h3>
+        <div class="callout">
+          \(\displaystyle h(k,i)=(h(k)+i)\bmod m\)
+        </div>
+        <p class="muted">Main downside: <strong>primary clustering</strong> (long blocks grow).</p>
+
+        <h3>Quadratic probing</h3>
+        <div class="callout">
+          \(\displaystyle h(k,i)=(h(k)+i^2)\bmod m\)
+        </div>
+        <p class="muted">Reduces primary clustering but may create <strong>secondary clustering</strong> (same start index ⇒ same probe pattern).</p>
+
+        <h3>Double hashing</h3>
+        <div class="callout good">
+          \(\displaystyle h(k,i)=(h_1(k)+i\cdot h_2(k))\bmod m\)
+        </div>
+        <p class="muted">Usually best distribution. The step size \(h_2(k)\) depends on key.</p>
+
+        <div class="callout warn">
+          <strong>Critical rule:</strong> If \(\gcd(h_2(k), m)\ne 1\), your probe may cycle through only part of the table and fail even when empty slots exist.
+          <br />Exam-friendly setup is: \(m\) prime and \(h_2(k)\in\{1,\dots,m-1\}\).
+        </div>
+
+        <h3>Worked example (linear probing)</h3>
+        <div class="callout good">
+          <span class="badge">Given</span> \(m=11\), \(h(k)=k\bmod 11\), insert \(21,32,14,25,44,11\).
+        </div>
+        <pre>21 -> 10
+32 -> 10 occupied -> 0
+14 -> 3
+25 -> 3 occupied -> 4
+44 -> 0 occupied -> 1
+11 -> 0 occupied -> 1 occupied -> 2
+
+Final (index:value):
+0: 32
+1: 44
+2: 11
+3: 14
+4: 25
+10: 21</pre>
+
+        <h3>Worked example (double hashing)</h3>
+        <div class="callout good">
+          <span class="badge">Given</span> \(m=13\), \(h_1(k)=k\bmod 13\), \(h_2(k)=1+(k\bmod 12)\), insert \(18,41,22,44,59\).
+        </div>
+        <pre>18: h1=5 -> place at 5
+41: h1=2 -> place at 2
+22: h1=9 -> place at 9
+44: h1=5 collision, h2=1+(44 mod 12)=9
+    probes: 5 (taken), (5+1*9)=14 mod 13=1 -> place at 1
+59: h1=7 -> place at 7
+
+Occupied: 1:44, 2:41, 5:18, 7:59, 9:22</pre>
+      </section>
+
+      <section class="card" id="search">
+        <h2>5) Searching & counting probes (very exam-heavy)</h2>
+
+        <h3>Chaining search</h3>
+        <p>Compute \(i=h(k)\), scan the bucket list.</p>
+        <div class="callout">
+          Successful comparisons = position in list. Unsuccessful comparisons = full list length.
+        </div>
+
+        <h3>Open addressing search (linear / quadratic / double)</h3>
+        <p>Probe \(h(k,0),h(k,1),\dots\) until one of the stop conditions:</p>
+
+        <table>
+          <tr><th>What you see</th><th>Meaning</th><th>Do you stop?</th></tr>
+          <tr>
+            <td>OCCUPIED with key \(k\)</td>
+            <td>found</td>
+            <td><strong>Yes</strong></td>
+          </tr>
+          <tr>
+            <td>OCCUPIED with different key</td>
+            <td>keep probing</td>
+            <td>No</td>
+          </tr>
+          <tr>
+            <td>EMPTY (never used)</td>
+            <td>key not in table</td>
+            <td><strong>Yes</strong> (fail)</td>
+          </tr>
+          <tr>
+            <td>DELETED (tombstone)</td>
+            <td>was used before</td>
+            <td class="bad"><strong>No</strong> (must continue)</td>
+          </tr>
+        </table>
+
+        <div class="callout warn">
+          <strong>One-line rule:</strong> In open addressing, <em>successful search stops at key</em>, <em>unsuccessful search stops at EMPTY</em>, <em>tombstones do not stop search</em>.
+        </div>
+
+        <h3>Mini-demo: probe counting with tombstone</h3>
+        <p>Assume linear probing, \(m=11\), \(h(k)=k\bmod 11\). Table has:</p>
+        <pre>0: 32
+1: DELETED
+2: 11
+10: 21
+(all other slots EMPTY)</pre>
+
+        <div class="twoCol">
+          <div class="callout good">
+            <strong>Search 11</strong> (h=0): probe 0 (32), 1 (DEL), 2 (11) ⇒ <strong>3 probes</strong>.
+          </div>
+          <div class="callout">
+            <strong>Search 44</strong> (h=0): probe 0,1,2,3 (EMPTY) ⇒ stop fail ⇒ <strong>4 probes</strong>.
+          </div>
+        </div>
+
+        <details>
+          <summary>Optional (if your course includes it): expected probes formulas</summary>
+          <p class="muted small">Only include in answers if your lecturer/tutorials taught these. Otherwise use qualitative statements.</p>
+          <ul class="small">
+            <li><strong>Linear probing (approx):</strong> successful \(\approx \frac{1}{2}\left(1+\frac{1}{1-\alpha}\right)\), unsuccessful \(\approx \frac{1}{2}\left(1+\frac{1}{(1-\alpha)^2}\right)\).</li>
+            <li>These show probe counts explode as \(\alpha\to 1\).</li>
+          </ul>
+        </details>
+      </section>
+
+      <section class="card" id="delete">
+        <h2>6) Deletion & tombstones (the #1 open-addressing trap)</h2>
+
+        <h3>Why you can’t just erase to EMPTY</h3>
+        <p>If you set a deleted slot to EMPTY, you can break the probe chain and make existing keys “invisible”.</p>
+
+        <div class="callout bad">
+          <strong>Core idea:</strong> Search stops at EMPTY. If you create a fake EMPTY inside a probe chain, future searches stop too early.
+        </div>
+
+        <h3>The fix: tombstones</h3>
+        <p>When deleting in open addressing, mark the slot as <strong>DELETED</strong> (a tombstone), not EMPTY.</p>
+
+        <h3>Insertion with tombstones</h3>
+        <p>Common rule: during insertion, you can place the new key into the <strong>first tombstone</strong> you encounter in the probe sequence (because it’s safe to reuse), but ensure you’d still detect duplicates if the question cares (many exams ignore duplicates).</p>
+
+        <h3>Hard mini-example (correctness)</h3>
+        <div class="callout good">
+          Insert 21 (to 10), then 32 (collides at 10, goes to 0). If you delete 21:
+          <br />Index 10 becomes DELETED (not EMPTY), so searching 32 starting at 10 still probes to 0 and succeeds.
+        </div>
+
+        <div class="callout warn">
+          <strong>Performance note:</strong> Too many tombstones make searches longer. That’s when you rehash.
+        </div>
+      </section>
+
+      <section class="card" id="design">
+        <h2>7) Table size choice, primes, and rehashing</h2>
+
+        <h3>Choosing \(m\)</h3>
+        <p>Open addressing usually performs best when \(m\) is prime and \(\alpha\) is kept moderate (e.g., \(\le 0.7\)–0.8).</p>
+        <div class="callout">
+          <strong>Design steps:</strong>
+          <ol class="small">
+            <li>Pick target \(\alpha\) (given or typical).</li>
+            <li>Compute \(m \ge \lceil n/\alpha\rceil\).</li>
+            <li>For open addressing, pick a nearby <strong>prime</strong> \(m\).</li>
+          </ol>
+        </div>
+
+        <h3>Why primes matter (simple)</h3>
+        <ul class="small">
+          <li>For \(h(k)=k\bmod m\), prime \(m\) reduces patterns when keys have common factors.</li>
+          <li>For double hashing, prime \(m\) + \(1\le h_2(k)\le m-1\) helps guarantee full coverage.</li>
+        </ul>
+
+        <h3>Rehashing / resizing</h3>
+        <div class="callout good">
+          When \(\alpha\) gets too large (or too many tombstones), create a larger table and re-insert all live keys using the new \(m\).
+        </div>
+        <p class="muted">Rehashing “cleans out” tombstones and shortens probe sequences.</p>
+      </section>
+
+      <section class="card" id="hard">
+        <h2>8) Hard traps & A-range notes</h2>
+
+        <h3>Trap list (memorize)</h3>
+        <ul class="small">
+          <li><strong>Stop condition:</strong> unsuccessful search stops at EMPTY, not at DELETED.</li>
+          <li><strong>Linear probing:</strong> primary clustering (blocks).</li>
+          <li><strong>Quadratic probing:</strong> may not visit all slots if not carefully designed; can fail even with empty slots.</li>
+          <li><strong>Double hashing:</strong> if \(\gcd(h_2(k),m)\ne 1\), probe cycles ⇒ insertion/search issues.</li>
+          <li><strong>Load factor:</strong> for open addressing \(\alpha\) near 1 ⇒ huge probe counts.</li>
+          <li><strong>Order matters:</strong> insertion order can change final table in open addressing.</li>
+          <li><strong>Mod arithmetic:</strong> always reduce probe index mod \(m\).</li>
+        </ul>
+
+        <h3>Tough concept: “cycle” in double hashing</h3>
+        <div class="callout warn">
+          Example: \(m=12\), \(h_2(k)=6\). Probes from any start index visit only 2 positions (step 6): \(i, i+6, i, i+6,\dots\).
+          So insertion can fail even when empty slots exist.
+        </div>
+
+        <h3>Another tough concept: quadratic probing may not cover table</h3>
+        <div class="callout warn">
+          Quadratic probes are \((h+i^2)\bmod m\). Depending on \(m\), \(i^2\bmod m\) hits only a subset of residues, so you can miss empty slots.
+          (Courses often avoid this by choosing \(m\) prime and imposing constraints on \(\alpha\).)
+        </div>
+      </section>
+
+      <section class="card" id="practice">
+        <h2>9) Hard practice set (COMP2119-style)</h2>
+        <p class="muted">Try without the key first. These cover the toughest exam traps: probing, tombstones, and step-coprime logic.</p>
+
+        <h3>A) Build the final table (show probe indices)</h3>
+        <ol class="small">
+          <li><strong>Linear probing:</strong> \(m=11\), \(h(k)=k\bmod 11\), insert: 22, 1, 12, 23, 34, 45.</li>
+          <li><strong>Quadratic probing:</strong> \(m=13\), \(h(k)=k\bmod 13\), \(h(k,i)=(h(k)+i^2)\bmod 13\), insert: 18, 31, 44, 57, 70.</li>
+          <li><strong>Double hashing:</strong> \(m=13\), \(h_1(k)=k\bmod 13\), \(h_2(k)=1+(k\bmod 12)\), insert: 26, 39, 52, 65, 78.</li>
+          <li><strong>Chaining:</strong> \(m=7\), \(h(k)=k\bmod 7\), insert: 10, 17, 24, 31, 38 (front insertion).</li>
+        </ol>
+
+        <h3>B) Search tracing (count probes)</h3>
+        <p class="small">Assume linear probing, \(m=11\), \(h(k)=k\bmod 11\). Table state:</p>
+        <pre>0: 32
+1: DELETED
+2: 11
+3: 14
+4: 25
+10: 21
+(all others EMPTY)</pre>
+        <ol class="small">
+          <li>How many probes to search 25?</li>
+          <li>How many probes to search 44 (not present)?</li>
+          <li>If index 10 were mistakenly set to EMPTY (not DELETED), would searching 32 succeed or fail? Explain in one line.</li>
+        </ol>
+
+        <h3>C) Design questions (load factor)</h3>
+        <ol class="small">
+          <li>You need to store \(n=60{,}000\) keys with open addressing and \(\alpha\le 0.75\). What minimum \(m\) do you need?</li>
+          <li>If \(m=1009\) and you insert \(n=700\) keys, what is \(\alpha\)? Is that safe for open addressing?</li>
+        </ol>
+
+        <h3>D) Concept T/F (write T/F)</h3>
+        <ol class="small">
+          <li>In open addressing, an unsuccessful search stops when it sees a DELETED marker.</li>
+          <li>Linear probing can create primary clustering.</li>
+          <li>With double hashing, if \(m\) is prime and \(h_2(k)\in\{1,\dots,m-1\}\), the probe visits all slots.</li>
+          <li>Chaining can store more than \(m\) keys.</li>
+          <li>In open addressing, \(\alpha\) may exceed 1 without problems.</li>
+        </ol>
+
+        <details>
+          <summary>Answer key (open only after you try)</summary>
+          <div class="hr"></div>
+
+          <h3>A) Final tables (sketch answers)</h3>
+          <p class="muted small">Exact slot layouts depend on correct probing; use this to check.</p>
+          <ol class="small">
+            <li><strong>Linear, m=11:</strong> 22→0, 1→1, 12→2, 23→3, 34→4, 45→5 (a block forms at 0–5).</li>
+            <li><strong>Quadratic, m=13:</strong> 18→5, 31→5 collides →6, 44→5 collides →9, 57→5 collides →1, 70→5 collides →? (probe with i^2: 0,1,4,9,3,12,...), first empty slot is 8 → place at 8.</li>
+            <li><strong>Double, m=13:</strong> 26→0, 39→0 collides step 4 →4, 52→0 collides step 5 →5, 65→0 collides step 6 →6, 78→0 collides step 7 →7.</li>
+            <li><strong>Chaining, m=7:</strong> all keys ≡3 mod 7, so bucket 3 chain: 38→31→24→17→10.</li>
+          </ol>
+
+          <h3>B) Probes</h3>
+          <ol class="small">
+            <li>Search 25: \(h=3\) → check 3 (14) then 4 (25) ⇒ 2 probes.</li>
+            <li>Search 44: \(h=0\) → 0,1(DEL),2,3,4,5(EMPTY) ⇒ 6 probes.</li>
+            <li>If 10 is set to EMPTY, searching 32 starting at 10 would stop immediately and <strong>fail</strong> (breaks probe chain).</li>
+          </ol>
+
+          <h3>C) Design</h3>
+          <ol class="small">
+            <li>\(m \ge \lceil 60000/0.75\rceil = 80000\) (then choose a nearby prime if required).</li>
+            <li>\(\alpha=700/1009\approx 0.694\). Generally acceptable for open addressing.</li>
+          </ol>
+
+          <h3>D) T/F</h3>
+          <ol class="small">
+            <li>F</li>
+            <li>T</li>
+            <li>T</li>
+            <li>T</li>
+            <li>F</li>
+          </ol>
+        </details>
+
+        <div class="footer">
+          Tip: If you can do A & B quickly and explain the tombstone rule clearly, you are A-range on hashing.
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
